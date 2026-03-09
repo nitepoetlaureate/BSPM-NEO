@@ -1,0 +1,19 @@
+{
+  "version": "3.1.0",
+  "fields": [
+    {
+      "key": "barry_grip_strength",
+      "label": "Barry's Grip Strength",
+      "group": "Barry Settings",
+      "type": "number",
+      "defaultValue": 10
+    },
+    {
+      "key": "global_gravity",
+      "label": "Global Gravity Modifier",
+      "group": "Physics",
+      "type": "number",
+      "defaultValue": 1
+    }
+  ]
+}

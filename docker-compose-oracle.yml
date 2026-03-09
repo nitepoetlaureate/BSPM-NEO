@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  front_desk:
+    image: python:3.11-slim-bullseye
+    container_name: ccgs_front_desk
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - TAILSCALE_IP=100.x.x.x
+    volumes:
+      - ./:/workspace  # Mount the repo
+    working_dir: /workspace/tools/unified-backend
+    command: >
+      bash -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+
+  design_pit:
+    image: python:3.11-slim-bullseye
+    container_name: ccgs_design_pit
+    restart: always
+    volumes:
+      - ./design:/workspace/design
+      - ./docs:/workspace/docs
+      - ./production:/workspace/production
+    working_dir: /workspace
+    command: tail -f /dev/null # Placeholder for math validation scripts

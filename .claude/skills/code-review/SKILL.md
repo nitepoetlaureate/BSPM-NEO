@@ -1,74 +1,58 @@
 ---
 name: code-review
-description: "Performs an architectural and quality code review on a specified file or set of files. Checks for coding standard compliance, architectural pattern adherence, SOLID principles, testability, and performance concerns."
-argument-hint: "[path-to-file-or-directory]"
+description: "Performs a rigorous quality and architectural review of GB Studio scripts (GBVM/GBScript) and project structure. Checks for script depth, variable efficiency, and bank optimization."
+argument-hint: "[path-to-script-or-scene]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
+# Code/Quality Purifier: GB Studio Review
+
 When this skill is invoked:
 
-1. **Read the target file(s)** in full.
+1. **Read the target file(s)** (GBS scripts, GBVM files, or .gbsproj JSON fragments).
 
-2. **Read the CLAUDE.md** for project coding standards.
+2. **Read CLAUDE.md** for project-specific naming conventions and variable ranges.
 
-3. **Identify the system category** (engine, gameplay, AI, networking, UI, tools)
-   and apply category-specific standards.
+3. **Evaluate against GB Studio Standards**:
+   - [ ] **Script Depth**: Ensure no script exceeds safe GBVM stack limits (instruction depth).
+   - [ ] **Variable Usage**: Verify variables are scoped correctly (Local vs Global) and reused where possible to save the 512-variable limit.
+   - [ ] **Actor/Trigger Limits**: Confirm scene does not exceed 20 actors or 30 triggers.
+   - [ ] **Bank Optimization**: Check that large scripts or data aren't causing bank overflows.
+   - [ ] **Logic Verification**: Replace unit test checks with "Logic Injection" readiness (can this script be triggered/tested in isolation via `gb-studio-cli`?).
 
-4. **Evaluate against coding standards**:
-   - [ ] Public methods and classes have doc comments
-   - [ ] Cyclomatic complexity under 10 per method
-   - [ ] No method exceeds 40 lines (excluding data declarations)
-   - [ ] Dependencies are injected (no static singletons for game state)
-   - [ ] Configuration values loaded from data files
-   - [ ] Systems expose interfaces (not concrete class dependencies)
+4. **Check Architectural Compliance**:
+   - [ ] **Modular Scripts**: Are common logic blocks extracted into "Custom Scripts"?
+   - [ ] **Event Flow**: No deep nesting of "If" statements (prefer early exits or state machine switches).
+   - [ ] **Hardware Compatibility**: No 16-bit operations where 8-bit suffices.
 
-5. **Check architectural compliance**:
-   - [ ] Correct dependency direction (engine <- gameplay, not reverse)
-   - [ ] No circular dependencies between modules
-   - [ ] Proper layer separation (UI does not own game state)
-   - [ ] Events/signals used for cross-system communication
-   - [ ] Consistent with established patterns in the codebase
+5. **Output the review** in this format:
 
-6. **Check SOLID compliance**:
-   - [ ] Single Responsibility: Each class has one reason to change
-   - [ ] Open/Closed: Extendable without modification
-   - [ ] Liskov Substitution: Subtypes substitutable for base types
-   - [ ] Interface Segregation: No fat interfaces
-   - [ ] Dependency Inversion: Depends on abstractions, not concretions
+```markdown
+## Code Review: [Script/Scene Name]
 
-7. **Check for common game development issues**:
-   - [ ] Frame-rate independence (delta time usage)
-   - [ ] No allocations in hot paths (update loops)
-   - [ ] Proper null/empty state handling
-   - [ ] Thread safety where required
-   - [ ] Resource cleanup (no leaks)
+### GB Studio Compliance: [X/5 passing]
+[List violations: e.g., "Script depth exceeds 255 instructions", "Global variable leak"]
 
-8. **Output the review** in this format:
+### Architecture: [CLEAN / BLOATED / DEBT FOUND]
+[Analyze use of Custom Scripts and event flow]
 
-```
-## Code Review: [File/System Name]
+### Resource Efficiency
+[VRAM, Variable, and Actor usage analysis]
 
-### Standards Compliance: [X/6 passing]
-[List failures with line references]
-
-### Architecture: [CLEAN / MINOR ISSUES / VIOLATIONS FOUND]
-[List specific architectural concerns]
-
-### SOLID: [COMPLIANT / ISSUES FOUND]
-[List specific violations]
-
-### Game-Specific Concerns
-[List game development specific issues]
-
-### Positive Observations
-[What is done well -- always include this section]
+### Logic Verification Readiness
+[Can this be verified via `gb-studio-cli` injection? Yes/No]
 
 ### Required Changes
-[Must-fix items before approval]
+[Must-fix items: e.g., "Flatten nested conditionals in Actor 3"]
 
 ### Suggestions
-[Nice-to-have improvements]
+[Optimization tips]
 
-### Verdict: [APPROVED / APPROVED WITH SUGGESTIONS / CHANGES REQUIRED]
+### Verdict: [PURIFIED / NEEDS CLEANUP / REJECTED]
 ```
+
+### Rules
+- Prioritize **hardware limitations** over "clean code" abstractions if they conflict.
+- Reject any script that uses "Wait" commands in global/persistent loops without clear exit conditions.
+- Flags "On Update" scripts that perform complex math every frame.

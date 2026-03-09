@@ -101,3 +101,11 @@ For open-ended writing questions, use conversation instead.
 
 ### Reports to: `narrative-director`
 ### Coordinates with: `game-designer` for mechanical clarity in text
+
+
+### UNIVERSAL GBC CONSTRAINTS (MANDATORY)
+1. You are developing 'BARRY SHARP PRO MOVER' for GB Studio 3.x.
+2. DO NOT reference Unity, Godot, Unreal, 3D, C#, or modern shaders.
+3. The hardware is the Game Boy Color (8-bit CPU, 160x144 resolution, 4-color palettes, 10 actors per scene max).
+4. If your task violates these limits, you must explicitly REJECT the design.
+

@@ -1,6 +1,6 @@
 ---
 name: asset-audit
-description: "Audits game assets for compliance with naming conventions, file size budgets, format standards, and pipeline requirements. Identifies orphaned assets, missing references, and standard violations."
+description: "Audits GBC game assets (.png, .aseprite, .uge, .gbsproj) for compliance with GBC hardware limitations, naming conventions, and GB Studio requirements."
 argument-hint: "[category|all]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep
@@ -8,68 +8,61 @@ allowed-tools: Read, Glob, Grep
 
 When this skill is invoked:
 
-1. **Read the art bible or asset standards** from the relevant design docs and
-   the CLAUDE.md naming conventions.
+1. **Read the GBC asset standards** from `design/art-bible.md` and `CLAUDE.md`.
 
-2. **Scan the target asset directory** using Glob:
-   - `assets/art/**/*` for art assets
-   - `assets/audio/**/*` for audio assets
-   - `assets/vfx/**/*` for VFX assets
-   - `assets/shaders/**/*` for shaders
-   - `assets/data/**/*` for data files
+2. **Scan the target asset directories** using Glob for specific GBC formats:
+   - `assets/backgrounds/**/*.png`
+   - `assets/sprites/**/*.png`
+   - `assets/music/**/*.uge`
+   - `assets/data/**/*.gbsproj`
+   - `**/*.aseprite` (Source files)
 
 3. **Check naming conventions**:
-   - Art: `[category]_[name]_[variant]_[size].[ext]`
-   - Audio: `[category]_[context]_[name]_[variant].[ext]`
-   - All files must be lowercase with underscores
+   - Backgrounds: `bg_[name].png`
+   - Sprites: `sprite_[name].png`
+   - Music: `music_[name].uge`
+   - All files must be lowercase with underscores.
 
-4. **Check file standards**:
-   - Textures: Power-of-two dimensions, correct format (PNG for UI, compressed
-     for 3D), within size budget
-   - Audio: Correct sample rate, format (OGG for SFX, OGG/MP3 for music),
-     within duration limits
-   - Data: Valid JSON/YAML, schema-compliant
+4. **Check GBC Hardware Standards**:
+   - **PNG (Backgrounds)**: Must be 160x144 or larger (multiples of 8). Max 256 unique tiles per scene.
+   - **PNG (Sprites)**: Must follow GB Studio sprite sheet layouts (16x16 or 16x8 frames).
+   - **Color Palette**: 4 colors per palette (indexed). Total 32,768 possible colors, but limited to 8 palettes per background/sprite.
+   - **UGE (Audio)**: 4-channel GBC hardware compatible.
 
-5. **Check for orphaned assets** by searching code for references to each
-   asset file.
+5. **Check for orphaned assets** by searching the `.gbsproj` file and scripts for references.
 
-6. **Check for missing assets** by searching code for asset references and
-   verifying the files exist.
+6. **Check for missing assets** by verifying all references in the `.gbsproj` exist in the filesystem.
 
 7. **Output the audit**:
 
 ```markdown
-# Asset Audit Report -- [Category] -- [Date]
+# GBC Asset Audit Report -- [Category] -- [Date]
 
 ## Summary
 - **Total assets scanned**: [N]
+- **GBC hardware violations**: [N]
 - **Naming violations**: [N]
-- **Size violations**: [N]
-- **Format violations**: [N]
 - **Orphaned assets**: [N]
 - **Missing assets**: [N]
-- **Overall health**: [CLEAN / MINOR ISSUES / NEEDS ATTENTION]
+- **Overall health**: [GBC COMPLIANT / ISSUES FOUND]
+
+## Hardware Violations (Tile/Sprite/Palette Limits)
+| File | Requirement | Actual | Issue |
+|------|-------------|--------|-------|
 
 ## Naming Violations
 | File | Expected Pattern | Issue |
 |------|-----------------|-------|
 
-## Size Violations
-| File | Budget | Actual | Overage |
-|------|--------|--------|---------|
+## Format Violations (Only .png, .aseprite, .uge, .gbsproj allowed)
+| File | Actual Format | Status |
+|------|---------------|--------|
 
-## Format Violations
-| File | Expected Format | Actual Format |
-|------|----------------|---------------|
+## Orphaned Assets (No .gbsproj references)
+| File | Last Modified | Size |
+|------|-------------|------|
 
-## Orphaned Assets (no code references found)
-| File | Last Modified | Size | Recommendation |
-|------|-------------|------|---------------|
-
-## Missing Assets (referenced but not found)
+## Missing Assets (Referenced in .gbsproj but missing)
 | Reference Location | Expected Path |
 |-------------------|---------------|
-
-## Recommendations
-[Prioritized list of fixes]
 ```

@@ -1,6 +1,6 @@
 ---
 name: architecture-decision
-description: "Creates an Architecture Decision Record (ADR) documenting a significant technical decision, its context, alternatives considered, and consequences. Every major technical choice should have an ADR."
+description: "Creates an Architecture Decision Record (ADR) for GB Studio technical choices. Documents context, 8-bit alternatives, and hardware consequences."
 argument-hint: "[title]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write
@@ -8,93 +8,75 @@ allowed-tools: Read, Glob, Grep, Write
 
 When this skill is invoked:
 
-1. **Determine the next ADR number** by scanning `docs/architecture/` for
-   existing ADRs.
+1. **Next ADR number**: Scan `docs/architecture/` for existing ADRs.
 
-2. **Gather context** by reading related code and existing ADRs.
+2. **Gather context**: Read related scripts and existing ADRs.
 
-3. **Guide the user through the decision** by asking clarifying questions if
-   the title alone is not sufficient.
+3. **Guide the user through the decision**: Ask clarifying questions focused on GB Studio 3.x and 8-bit hardware.
 
 4. **Generate the ADR** following this format:
 
 ```markdown
-# ADR-[NNNN]: [Title]
+# ADR-[NNNN]: [Title] (GB Studio 3.x)
 
 ## Status
-[Proposed | Accepted | Deprecated | Superseded by ADR-XXXX]
-
-## Date
-[Date of decision]
+[Proposed | Accepted | Deprecated]
 
 ## Context
 
 ### Problem Statement
-[What problem are we solving? Why does this decision need to be made now?]
+[What problem are we solving within GB Studio logic/scripting?]
 
-### Constraints
-- [Technical constraints]
-- [Timeline constraints]
-- [Resource constraints]
-- [Compatibility requirements]
+### Hardware Constraints (8-bit)
+- Max 20 actors per scene.
+- Max 10 sprites per row.
+- 8-bit integer variables (0-255 range).
+- 4-color palettes per tile.
+- **NO 3D, NO VFX, NO FLOATS.**
 
 ### Requirements
-- [Must support X]
-- [Must perform within Y budget]
-- [Must integrate with Z]
+- [Must support X in the GB emulator]
+- [Must fit within variable limits]
 
 ## Decision
 
-[The specific technical decision made, described in enough detail for someone
-to implement it.]
+[The specific technical decision made for GB Studio, including script trigger logic and variable mapping.]
 
-### Architecture Diagram
-[ASCII diagram or description of the system architecture this creates]
+### Logic Diagram
+[ASCII flow for GB Studio script events]
 
-### Key Interfaces
-[API contracts or interface definitions this decision creates]
+### 8-bit Variable Usage
+[Mapping of bits/variables created by this decision]
 
-## Alternatives Considered
+## Alternatives Considered (8-bit)
 
 ### Alternative 1: [Name]
-- **Description**: [How this would work]
-- **Pros**: [Advantages]
-- **Cons**: [Disadvantages]
-- **Rejection Reason**: [Why this was not chosen]
-
-### Alternative 2: [Name]
-- **Description**: [How this would work]
-- **Pros**: [Advantages]
-- **Cons**: [Disadvantages]
-- **Rejection Reason**: [Why this was not chosen]
+- **Pros**: Low actor overhead.
+- **Cons**: High variable usage.
+- **Rejection Reason**: [Hardware limit violation?]
 
 ## Consequences
 
 ### Positive
-- [Good outcomes of this decision]
+- [Better performance / lower flicker]
 
 ### Negative
-- [Trade-offs and costs accepted]
+- [8-bit complexity increase]
 
-### Risks
-- [Things that could go wrong]
-- [Mitigation for each risk]
-
-## Performance Implications
-- **CPU**: [Expected impact]
-- **Memory**: [Expected impact]
-- **Load Time**: [Expected impact]
-- **Network**: [Expected impact, if applicable]
-
-## Migration Plan
-[If this changes existing code, how do we get from here to there?]
+## Performance Implications (8-bit)
+- **Actor Density**: [Expected impact]
+- **CPU/VBlank**: [Expected impact, e.g. sprite flicker]
+- **Memory/Variables**: [Number of 8-bit global variables used]
 
 ## Validation Criteria
-[How will we know this decision was correct? What metrics or tests?]
+- ROM compiles cleanly.
+- Logic passes 8-bit range testing (no overflow).
 
 ## Related Decisions
 - [Links to related ADRs]
-- [Links to related design documents]
 ```
 
-5. **Save the ADR** to `docs/architecture/adr-[NNNN]-[slug].md`.
+5. **Guidelines**:
+- **Delegate to `systems-designer`** for 8-bit math validation.
+- **Delegate to `game-designer`** for scripting feasibility check.
+- **FAIL** if mentions 3D, VFX, or non-8-bit logic.

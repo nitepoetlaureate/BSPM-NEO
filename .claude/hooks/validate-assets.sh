@@ -1,58 +1,50 @@
 #!/bin/bash
-# Claude Code PostToolUse hook: Validates asset files after Write/Edit
-# Checks naming conventions for files in assets/ directory
-# Exit 0 = success (non-blocking, PostToolUse cannot block)
-#
-# Input schema (PostToolUse for Write/Edit):
-# { "tool_name": "Write", "tool_input": { "file_path": "assets/data/foo.json", "content": "..." } }
+# .claude/hooks/validate-assets.sh - Enforces strict GBC Hardware Limits
 
-INPUT=$(cat)
+FILE_PATH=$1
 
-# Parse file path -- use jq if available, fall back to grep
-if command -v jq >/dev/null 2>&1; then
-    FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-else
-    FILE_PATH=$(echo "$INPUT" | grep -oE '"file_path"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/"file_path"[[:space:]]*:[[:space:]]*"//;s/"$//')
-fi
-
-# Normalize path separators (Windows backslash to forward slash)
-FILE_PATH=$(echo "$FILE_PATH" | sed 's|\\|/|g')
-
-# Only check files in assets/
-if ! echo "$FILE_PATH" | grep -qE '(^|/)assets/'; then
+if [[ ! -f "$FILE_PATH" ]]; then
     exit 0
 fi
 
-FILENAME=$(basename "$FILE_PATH")
-WARNINGS=""
-
-# Check naming convention (lowercase with underscores only) -- uses grep -E instead of grep -P
-if echo "$FILENAME" | grep -qE '[A-Z[:space:]-]'; then
-    WARNINGS="$WARNINGS\nNAMING: $FILE_PATH must be lowercase with underscores (got: $FILENAME)"
+# Check for ImageMagick 'identify'
+if ! command -v identify &> /dev/null; then
+    echo "Warning: ImageMagick not found. Skipping validation."
+    exit 0
 fi
 
-# Check JSON validity for data files
-if echo "$FILE_PATH" | grep -qE '(^|/)assets/data/.*\.json$'; then
-    if [ -f "$FILE_PATH" ]; then
-        # Find a working Python command
-        PYTHON_CMD=""
-        for cmd in python python3 py; do
-            if command -v "$cmd" >/dev/null 2>&1; then
-                PYTHON_CMD="$cmd"
-                break
-            fi
-        done
+# Identify if file is a Sprite or Background based on path
+IS_SPRITE=false
+if [[ "$FILE_PATH" == *"sprites"* ]]; then
+    IS_SPRITE=true
+fi
 
-        if [ -n "$PYTHON_CMD" ]; then
-            if ! "$PYTHON_CMD" -m json.tool "$FILE_PATH" > /dev/null 2>&1; then
-                WARNINGS="$WARNINGS\nFORMAT: $FILE_PATH is not valid JSON"
-            fi
-        fi
+# Count unique colors
+COLOR_COUNT=$(identify -format "%k" "$FILE_PATH")
+
+if [ "$IS_SPRITE" = true ]; then
+    # GBC Sprites: 4 colors total, but Color 0 is Transparent = 3 visible colors.
+    # Note: If the file has a transparency layer, identify treats it as a color.
+    if [ "$COLOR_COUNT" -gt 4 ]; then
+        echo "Error: Sprite $FILE_PATH has $COLOR_COUNT colors. Max visible is 3 (+ transparent)."
+        exit 1
+    fi
+else
+    # GBC Backgrounds: Max 4 colors per 8x8 tile. 
+    if [ "$COLOR_COUNT" -gt 4 ]; then
+        echo "Error: Background $FILE_PATH has $COLOR_COUNT colors. Max allowed is 4."
+        exit 1
     fi
 fi
 
-if [ -n "$WARNINGS" ]; then
-    echo -e "=== Asset Validation ===$WARNINGS\n========================" >&2
+# Verify Dimensions (Must be multiples of 8)
+WIDTH=$(identify -format "%w" "$FILE_PATH")
+HEIGHT=$(identify -format "%h" "$FILE_PATH")
+
+if (( WIDTH % 8 != 0 )) || (( HEIGHT % 8 != 0 )); then
+    echo "Error: $FILE_PATH dimensions (${WIDTH}x${HEIGHT}) are not multiples of 8px (Game Boy Tiles)."
+    exit 1
 fi
 
+echo "GBC Asset Validation passed: $FILE_PATH"
 exit 0

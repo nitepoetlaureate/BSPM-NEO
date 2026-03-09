@@ -1,77 +1,55 @@
 ---
 name: playtest-report
-description: "Generates a structured playtest report template or analyzes existing playtest notes into a structured format. Use this to standardize playtest feedback collection and analysis."
+description: "Generates a structured playtest report for GB Studio projects. Analyzes playtest notes, focusing on hardware-accurate behavior and Game Boy ergonomics."
 argument-hint: "[new|analyze path-to-notes]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write
 ---
+# Code/Quality Purifier: GB Studio Playtest Report
 
-When invoked with `new`, generate this template:
+When this skill is invoked with `new`, generate this GB Studio specific template:
 
 ```markdown
-# Playtest Report
+# Playtest Report: [Build Name]
 
 ## Session Info
 - **Date**: [Date]
-- **Build**: [Version/Commit]
-- **Duration**: [Time played]
+- **ROM Build**: [Version/Commit]
+- **Platform**: [Original Hardware / Analogue Pocket / Emulator]
 - **Tester**: [Name/ID]
-- **Platform**: [PC/Console/Mobile]
-- **Input Method**: [KB+M / Gamepad / Touch]
-- **Session Type**: [First time / Returning / Targeted test]
+- **Input Method**: [Original GB / SNES Controller / Keyboard]
 
-## Test Focus
-[What specific features or flows were being tested]
+## Hardware Verification
+- **Visual Artifacts?** [Yes/No] (Flicker, tile corruption)
+- **Audio Lag?** [Yes/No]
+- **Input Responsiveness?** [Yes/No/Sluggish]
 
-## First Impressions (First 5 minutes)
-- **Understood the goal?** [Yes/No/Partially]
-- **Understood the controls?** [Yes/No/Partially]
-- **Emotional response**: [Engaged/Confused/Bored/Frustrated/Excited]
-- **Notes**: [Observations]
+## First Impressions (3-5 mins)
+- **Goal Clear?** [Yes/No]
+- **Text Readability?** [Good/Bad] (Small screen check)
+- **Emotional Response**: [Engaged/Confused/Frustrated]
 
 ## Gameplay Flow
-### What worked well
-- [Observation 1]
-- [Observation 2]
+### What worked
+- [Observation]
 
-### Pain points
-- [Issue 1 -- Severity: High/Medium/Low]
-- [Issue 2 -- Severity: High/Medium/Low]
+### GB Specific Pain Points
+- **Flicker on too many sprites**: [Yes/No]
+- **Navigation in small spaces**: [Issue]
+- **Menu navigation speed**: [Issue]
 
-### Confusion points
-- [Where the player was confused and why]
-
-### Moments of delight
-- [What surprised or pleased the player]
-
-## Bugs Encountered
-| # | Description | Severity | Reproducible |
-|---|-------------|----------|-------------|
-
-## Feature-Specific Feedback
-### [Feature 1]
-- **Understood purpose?** [Yes/No]
-- **Found engaging?** [Yes/No]
-- **Suggestions**: [Tester suggestions]
-
-## Quantitative Data (if available)
-- **Deaths**: [Count and locations]
-- **Time per area**: [Breakdown]
-- **Items used**: [What and when]
-- **Features discovered vs missed**: [List]
+## Bugs (Hardware vs Emulator)
+| # | Bug | Severity | Found on Hardware? |
+|---|-----|----------|-------------------|
+| 1 | Tile corruption on screen transition | High | Yes |
 
 ## Overall Assessment
-- **Would play again?** [Yes/No/Maybe]
 - **Difficulty**: [Too Easy / Just Right / Too Hard]
-- **Pacing**: [Too Slow / Good / Too Fast]
-- **Session length preference**: [Shorter / Good / Longer]
+- **Pacing**: [Good / Laggy / Too Fast]
+- **Verdict**: [READY FOR RELEASE / NEEDS POLISH / UNSTABLE]
 
-## Top 3 Priorities from this session
-1. [Most important finding]
-2. [Second priority]
-3. [Third priority]
+## Top 3 Priorities
+1. [Highest priority]
 ```
 
-When invoked with `analyze`, read the raw notes, cross-reference with existing
-design documents, and fill in the template above with structured findings.
-Flag any playtest observations that conflict with design intent.
+When invoked with `analyze`, process raw notes into this format, prioritizing hardware-specific observations over general gameplay feedback.

@@ -1,70 +1,39 @@
 ---
 name: tech-debt
-description: "Track, categorize, and prioritize technical debt across the codebase. Scans for debt indicators, maintains a debt register, and recommends repayment scheduling."
+description: "Track and prioritize technical debt in GB Studio projects. Focuses on unoptimized tilesets, redundant GBVM scripts, and bank overflows."
 argument-hint: "[scan|add|prioritize|report]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write
 ---
+# Code/Quality Purifier: GB Studio Tech Debt Register
+
 When this skill is invoked:
 
-1. **Parse the subcommand** from the argument:
-   - `scan` — Scan the codebase for tech debt indicators
-   - `add` — Add a new tech debt entry manually
-   - `prioritize` — Re-prioritize the existing debt register
-   - `report` — Generate a summary report of current debt status
+1. **Scan Subcommand**:
+   - **TODO/FIXME**: Scan scripts and project JSON for developer notes.
+   - **Tile Duplication**: Identify backgrounds with similar tilesets that could be merged.
+   - **Variable Bloat**: Find global variables that aren't used or could be local.
+   - **Instruction Depth**: Detect scripts nearing the 255-instruction limit.
+   - **Bank Overflows**: Find large scripts that could be broken up.
 
-2. **For `scan`**:
-   - Search the codebase for debt indicators:
-     - `TODO` comments (count and categorize)
-     - `FIXME` comments (these are bugs disguised as debt)
-     - `HACK` comments (workarounds that need proper solutions)
-     - `@deprecated` markers
-     - Duplicated code blocks (similar patterns in multiple files)
-     - Files over 500 lines (potential god objects)
-     - Functions over 50 lines (potential complexity)
-   - Categorize each finding:
-     - **Architecture Debt**: Wrong abstractions, missing patterns, coupling issues
-     - **Code Quality Debt**: Duplication, complexity, naming, missing types
-     - **Test Debt**: Missing tests, flaky tests, untested edge cases
-     - **Documentation Debt**: Missing docs, outdated docs, undocumented APIs
-     - **Dependency Debt**: Outdated packages, deprecated APIs, version conflicts
-     - **Performance Debt**: Known slow paths, unoptimized queries, memory issues
-   - Update the debt register at `docs/tech-debt-register.md`
+2. **Categorize findings**:
+   - **Hardware Debt**: Violates GB Studio limits (tiles, sprites, actors).
+   - **Logic Debt**: Complex/redundant GBVM scripts.
+   - **Asset Debt**: Non-optimized images (non-2-bit, non-tileset-friendly).
+   - **Variable Debt**: Wasteful usage of the 512-variable global limit.
 
-3. **For `add`**:
-   - Prompt for: description, category, affected files, estimated fix effort, impact if left unfixed
-   - Append to the debt register
-
-4. **For `prioritize`**:
-   - Read the debt register
-   - Score each item by: `(impact_if_unfixed * frequency_of_encounter) / fix_effort`
-   - Re-sort the register by priority score
-   - Recommend which items to include in the next sprint
-
-5. **For `report`**:
-   - Read the debt register
-   - Generate summary statistics:
-     - Total items by category
-     - Total estimated fix effort
-     - Items added vs resolved since last report
-     - Trending direction (growing / stable / shrinking)
-   - Flag any items that have been in the register for more than 3 sprints
-   - Output the report
-
-### Debt Register Format
-
+3. **Report Status**:
 ```markdown
-## Technical Debt Register
-Last updated: [Date]
-Total items: [N] | Estimated total effort: [T-shirt sizes summed]
+## GB Studio Tech Debt Register
+Total items: [N] | Debt Status: [HEALTHY/WARNING/CRITICAL]
 
-| ID | Category | Description | Files | Effort | Impact | Priority | Added | Sprint |
-|----|----------|-------------|-------|--------|--------|----------|-------|--------|
-| TD-001 | [Cat] | [Description] | [files] | [S/M/L/XL] | [Low/Med/High/Critical] | [Score] | [Date] | [Sprint to fix or "Backlog"] |
+| ID | Category | Description | Effort | Impact |
+|----|----------|-------------|--------|--------|
+| TD-001 | Hardware | 200+ unique tiles in Scene A | S | High |
+| TD-002 | Variable | 50 unused global variables | M | Low |
 ```
 
 ### Rules
-- Tech debt is not inherently bad — it is a tool. The register tracks conscious decisions.
-- Every debt entry must explain WHY it was accepted (deadline, prototype, missing info)
-- "Scan" should run at least once per sprint to catch new debt
-- Items older than 3 sprints without action should either be fixed or consciously accepted with a documented reason
+- Hardware Debt is always prioritized over Logic Debt.
+- Any scene with > 192 background tiles is a "Critical" debt item.
+- Any script with > 255 instructions without a `Wait` is a "Critical" debt item.

@@ -1,70 +1,40 @@
 ---
 name: localize
-description: "Run the localization workflow: extract strings, validate localization readiness, check for hardcoded text, and generate translation-ready string tables."
-argument-hint: "[scan|extract|validate|status]"
+description: "Handles localization for GB Studio projects. Extracts strings from project JSON/scripts and validates character limits for Game Boy screens."
+argument-hint: "[scan|extract|status]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write, Bash
 ---
+# Code/Quality Purifier: GB Studio Localizer
+
 When this skill is invoked:
 
-1. **Parse the subcommand** from the argument:
-   - `scan` — Scan for localization issues (hardcoded strings, missing keys)
-   - `extract` — Extract new strings and generate/update string tables
-   - `validate` — Validate existing translations for completeness and format
-   - `status` — Report overall localization status
+1. **Scan Subcommand**:
+   - **Hardcoded Text**: Find text strings in project JSON/scripts.
+   - **Character Limits**: Identify strings exceeding 18-20 characters per line (GB screen width).
+   - **Variable Injection**: Check for `$Variable` usage in dialogue.
 
-2. **For `scan`**:
-   - Search `src/` for hardcoded user-facing strings:
-     - String literals in UI code that are not wrapped in a localization function
-     - Concatenated strings that should be parameterized
-     - Strings with positional placeholders (`%s`, `%d`) instead of named ones (`{playerName}`)
-   - Search for localization anti-patterns:
-     - Date/time formatting not using locale-aware functions
-     - Number formatting without locale awareness
-     - Text embedded in images or textures (flag asset files)
-     - Strings that assume left-to-right text direction
-   - Report all findings with file paths and line numbers
+2. **Extract Subcommand**:
+   - Generate a list of all dialogue and menu strings.
+   - Group by scene or script category.
+   - Output string table for translation (e.g., CSV or JSON format compatible with GB Studio assets).
 
-3. **For `extract`**:
-   - Scan all source files for localized string references
-   - Compare against the existing string table (if any) in `assets/data/`
-   - Generate new entries for strings that don't have keys yet
-   - Suggest key names following the convention: `[category].[subcategory].[description]`
-   - Output a diff of new strings to add to the string table
+3. **Status Report**:
+```markdown
+## GB Studio Localization Status
+Generated: [Date]
 
-4. **For `validate`**:
-   - Read all string table files in `assets/data/`
-   - Check each entry for:
-     - Missing translations (key exists but no translation for a locale)
-     - Placeholder mismatches (source has `{name}` but translation is missing it)
-     - String length violations (exceeds character limits for UI elements)
-     - Orphaned keys (translation exists but nothing references the key in code)
-   - Report validation results grouped by locale and severity
+| Locale | Strings | Coverage |
+|--------|---------|----------|
+| en (source) | [N] | 100% |
+| [lang] | [N] | [X]% |
 
-5. **For `status`**:
-   - Count total localizable strings
-   - Per locale: count translated, untranslated, and stale (source changed since translation)
-   - Generate a coverage matrix:
-
-   ```markdown
-   ## Localization Status
-   Generated: [Date]
-
-   | Locale | Total | Translated | Missing | Stale | Coverage |
-   |--------|-------|-----------|---------|-------|----------|
-   | en (source) | [N] | [N] | 0 | 0 | 100% |
-   | [locale] | [N] | [N] | [N] | [N] | [X]% |
-
-   ### Issues
-   - [N] hardcoded strings found in source code
-   - [N] strings exceeding character limits
-   - [N] placeholder mismatches
-   - [N] orphaned keys (can be cleaned up)
-   ```
+### Hardware Compatibility Issues
+- [N] strings exceed 20 characters per line.
+- [N] strings used without a "Wait" or "Clear" window.
+```
 
 ### Rules
-- English (en) is always the source locale
-- Every string table entry must include a translator comment explaining context
-- Never modify translation files directly — generate diffs for review
-- Character limits must be defined per-UI-element and enforced automatically
-- Right-to-left (RTL) language support should be considered from the start, not bolted on later
+- All text must fit within the Game Boy's 160x144 resolution constraints.
+- Prioritize **8-bit character sets**; warn if special characters are used that aren't in the project font.
+- Every localized string must have a corresponding "Wait" command for player readability.

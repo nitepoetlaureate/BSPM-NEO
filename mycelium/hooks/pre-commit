@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Example pre-commit hook — tests + secret scan.
+# Copy to .git/hooks/pre-commit and chmod +x.
+set -euo pipefail
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Run tests if install.sh, mycelium.sh, or anything under test/ is staged
+if git diff --cached --name-only | grep -qE '^(install\.sh|mycelium\.sh|test/)' 2>/dev/null; then
+  if [[ -x "$REPO_ROOT/test/test.sh" ]]; then
+    echo "running tests..."
+    # Hooks inherit git-local env vars (GIT_DIR, GIT_WORK_TREE, etc.).
+    # Clear them before running the inner temp repos created by the test suite.
+    while read -r var; do unset "$var"; done < <(git rev-parse --local-env-vars)
+    "$REPO_ROOT/test/test.sh" >/dev/null || { echo "tests failed"; exit 1; }
+    echo "tests passed"
+  fi
+fi
+
+# Secret scan
+if command -v gitleaks &>/dev/null; then
+  gitleaks git --staged --no-banner --redact -l warn
+fi

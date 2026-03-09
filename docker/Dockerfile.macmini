@@ -1,0 +1,31 @@
+# docker/Dockerfile.macmini - Engineering & Art Sandbox (x86)
+FROM node:18-bullseye-slim
+
+WORKDIR /app
+
+# Install system dependencies for Aseprite and GBStudio CLI
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    libglu1-mesa \
+    libxcursor1 \
+    libxi6 \
+    imagemagick \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install GBStudio CLI globally
+RUN npm install -g gb-studio-cli
+
+# Install UV for Python tools
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/uv
+ENV PATH="/uv/bin:${PATH}"
+
+# Copy application files
+COPY . .
+
+# Install python dependencies for injector and art scripts
+RUN cd tools/unified-backend && uv sync --frozen --no-dev
+
+# Command placeholder - will be overridden by docker-compose
+CMD ["tail", "-f", "/dev/null"]

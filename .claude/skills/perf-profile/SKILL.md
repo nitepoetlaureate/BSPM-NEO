@@ -1,93 +1,71 @@
 ---
 name: perf-profile
-description: "Structured performance profiling workflow. Identifies bottlenecks, measures against budgets, and generates optimization recommendations with priority rankings."
-argument-hint: "[system-name or 'full']"
+description: "Structured performance profiling for GB Studio projects. Measures GBVM instruction depth, VRAM/Tile usage, and engine constraints."
+argument-hint: "[scene-name or 'full']"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Bash
 ---
+# Code/Quality Purifier: GB Studio Perf Profiler
+
 When this skill is invoked:
 
 1. **Determine scope** from the argument:
-   - If a system name: focus profiling on that specific system
-   - If `full`: run a comprehensive profile across all systems
+   - If a scene name: profile that specific scene.
+   - If `full`: run a comprehensive scan of the entire project.
 
-2. **Read performance budgets** — Check for existing performance targets in design docs or CLAUDE.md:
-   - Target FPS (e.g., 60fps = 16.67ms frame budget)
-   - Memory budget (total and per-system)
-   - Load time targets
-   - Draw call budgets
-   - Network bandwidth limits (if multiplayer)
+2. **Read project budgets** (from CLAUDE.md or design/engine-constraints.md):
+   - **GBVM Instruction Depth**: (Max: 255-512 per script segment).
+   - **VRAM/Tile Limits**: (Max: 192 tiles for background, 64-96 for sprites).
+   - **Bank Limits**: (Max: 16KB per bank, monitoring script overflows).
+   - **Sprite Counts**: (Max: 10 sprites per scanline).
 
-3. **Analyze the codebase** for common performance issues:
+3. **Analyze Implementation**:
 
-   **CPU Profiling Targets**:
-   - `_process()` / `Update()` / `Tick()` functions — list all and estimate cost
-   - Nested loops over large collections
-   - String operations in hot paths
-   - Allocation patterns in per-frame code
-   - Unoptimized search/sort over game entities
-   - Expensive physics queries (raycasts, overlaps) every frame
+   **GBVM Analysis**:
+   - Count instructions in scripts (GBScript/GBVM).
+   - Flag deep nesting of branching logic.
+   - Detect redundant math in `On Update` loops.
 
-   **Memory Profiling Targets**:
-   - Large data structures and their growth patterns
-   - Texture/asset memory footprint estimates
-   - Object pool vs instantiate/destroy patterns
-   - Leaked references (objects that should be freed but aren't)
-   - Cache sizes and eviction policies
+   **Graphics/VRAM Analysis**:
+   - Analyze background tilesets in `assets/backgrounds/`.
+   - Calculate tile usage vs. limit (192 unique tiles).
+   - Check sprite sheets in `assets/sprites/` for excessive frame counts.
 
-   **Rendering Targets** (if applicable):
-   - Draw call estimates
-   - Overdraw from overlapping transparent objects
-   - Shader complexity
-   - Unoptimized particle systems
-   - Missing LODs or occlusion culling
-
-   **I/O Targets**:
-   - Save/load performance
-   - Asset loading patterns (sync vs async)
-   - Network message frequency and size
+   **Resource/Bank Analysis**:
+   - Check script size in `scripts/GBVM/`.
+   - Estimate bank pressure based on script/scene counts.
 
 4. **Generate the profiling report**:
 
-   ```markdown
-   ## Performance Profile: [System or Full]
-   Generated: [Date]
+```markdown
+## Performance Profile: [Scene/Project]
+Generated: [Date]
 
-   ### Performance Budgets
-   | Metric | Budget | Estimated Current | Status |
-   |--------|--------|-------------------|--------|
-   | Frame time | [16.67ms] | [estimate] | [OK/WARNING/OVER] |
-   | Memory | [target] | [estimate] | [OK/WARNING/OVER] |
-   | Load time | [target] | [estimate] | [OK/WARNING/OVER] |
-   | Draw calls | [target] | [estimate] | [OK/WARNING/OVER] |
+### Hardware Constraints
+| Metric | Budget | Estimated Current | Status |
+|--------|--------|-------------------|--------|
+| GBVM Depth | [255] | [estimate] | [OK/CRITICAL] |
+| Background Tiles | [192] | [count] | [OK/OVER] |
+| Sprite VRAM | [96] | [count] | [OK/WARNING] |
+| Bank Usage | [16KB] | [estimate] | [OK/FULL] |
 
-   ### Hotspots Identified
-   | # | Location | Issue | Estimated Impact | Fix Effort |
-   |---|----------|-------|------------------|------------|
-   | 1 | [file:line] | [description] | [High/Med/Low] | [S/M/L] |
-   | 2 | [file:line] | [description] | [High/Med/Low] | [S/M/L] |
+### Bottlenecks Identified
+| # | Location | Issue | Estimated Impact | Fix Effort |
+|---|----------|-------|------------------|------------|
+| 1 | [scene:actor] | Deep GBVM Nesting | Lag on trigger | [S/M/L] |
+| 2 | [background] | Unique tile overflow | Graphic glitching | [S] |
 
-   ### Optimization Recommendations (Priority Order)
-   1. **[Title]** — [Description of the optimization]
-      - Location: [file:line]
-      - Expected gain: [estimate]
-      - Risk: [Low/Med/High]
-      - Approach: [How to implement]
+### Optimization Recommendations
+1. **[Title]** — [Optimization]
+   - Approach: [Reuse tiles/Extract to custom script/8-bit only math]
+   - Impact: [High/Med/Low]
 
-   ### Quick Wins (< 1 hour each)
-   - [Simple optimization 1]
-   - [Simple optimization 2]
-
-   ### Requires Investigation
-   - [Area that needs actual runtime profiling to determine impact]
-   ```
-
-5. **Output the report** with a summary: top 3 hotspots, estimated headroom vs budget, and recommended next action.
+### Quick Wins (< 10 mins)
+- [Simple optimization]
+```
 
 ### Rules
-- Never optimize without measuring first — gut feelings about performance are unreliable
-- Recommendations must include estimated impact — "make it faster" is not actionable
-- Profile on target hardware, not just development machines
-- Distinguish between CPU-bound, GPU-bound, and I/O-bound bottlenecks
-- Consider worst-case scenarios (maximum entities, lowest spec hardware, worst network conditions)
-- Static analysis (this skill) identifies candidates; runtime profiling confirms
+- **No speculative optimization**: Only recommend changes that directly address a budget violation.
+- **Hardware First**: Focus exclusively on Game Boy (LR35902) hardware limits.
+- **VRAM is King**: Prioritize tile reduction above all visual flourishes.
+- **Instruction Depth**: Warn when scripts approach the 255-instruction limit before a mandatory wait/yield.

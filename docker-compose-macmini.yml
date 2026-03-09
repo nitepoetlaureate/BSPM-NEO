@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  art_forge:
+    image: ubuntu:22.04
+    container_name: ccgs_art_forge
+    restart: always
+    environment:
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+    volumes:
+      - ./assets:/workspace/assets
+      - ./tools/unified-backend:/workspace/backend
+      # We will mount Aseprite CLI here or install it via Dockerfile later
+    working_dir: /workspace
+    command: tail -f /dev/null # Placeholder for HuggingFace/Aseprite polling script
+
+  engineering_bay:
+    image: node:18-bullseye
+    container_name: ccgs_engineering_bay
+    restart: always
+    volumes:
+      - ./tools/gbstudio-factory:/workspace/factory
+      - ./assets:/workspace/assets
+      - ./scripts:/workspace/scripts
+      - ./:/workspace/root
+    working_dir: /workspace/factory
+    command: >
+      bash -c "npm install -g gb-studio-cli && tail -f /dev/null" # Placeholder for GBVM injected build script

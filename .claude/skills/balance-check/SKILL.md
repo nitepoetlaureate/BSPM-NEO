@@ -1,72 +1,49 @@
 ---
 name: balance-check
-description: "Analyzes game balance data files, formulas, and configuration to identify outliers, broken progressions, degenerate strategies, and economy imbalances. Use after modifying any balance-related data or design."
+description: "Analyzes game balance for GB Studio projects. Focuses on 8-bit math constraints, variable limits, and Game Boy progression curves."
 argument-hint: "[system-name|path-to-data-file]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep
 ---
+# Code/Quality Purifier: GB Studio Balance Check
 
 When this skill is invoked:
 
-1. **Identify the balance domain** from the argument.
+1. **Identify Balance Domain**: Combat, Economy, or Progression.
 
-2. **Read relevant data files** from `assets/data/` and `design/balance/`.
+2. **Read GB Studio Data**: Project JSON, variables, and design docs.
 
-3. **Read the design document** for the system being checked from `design/gdd/`.
+3. **Check 8-bit/16-bit Constraints**:
+   - **Math Overflow**: Identify variables that might exceed 255 (8-bit) or 65,535 (16-bit).
+   - **Precision**: Flag calculations that require floating-point (not natively supported).
+   - **Variable Efficiency**: Check if the 512-variable limit is being approached.
 
-4. **Perform analysis**:
+4. **Perform Analysis**:
+   - **Combat**: Analyze enemy HP vs player Damage at different levels.
+   - **Economy**: Map item costs vs player gold accumulation (8-bit limit).
+   - **Progression**: Plot XP curve vs. variable capacity.
 
-   For **combat balance**:
-   - Calculate DPS for all weapons/abilities at each power tier
-   - Check time-to-kill at each tier
-   - Identify any options that dominate all others (strictly better)
-   - Check if defensive options can create unkillable states
-   - Verify damage type/resistance interactions are balanced
-
-   For **economy balance**:
-   - Map all resource faucets and sinks with flow rates
-   - Project resource accumulation over time
-   - Check for infinite resource loops
-   - Verify gold sinks scale with gold generation
-   - Check if any items are never worth purchasing
-
-   For **progression balance**:
-   - Plot the XP curve and power curve
-   - Check for dead zones (no meaningful progression for too long)
-   - Check for power spikes (sudden jumps in capability)
-   - Verify content gates align with expected player power
-   - Check if skip/grind strategies break intended pacing
-
-   For **loot balance**:
-   - Calculate expected time to acquire each rarity tier
-   - Check pity timer math
-   - Verify no loot is strictly useless at any stage
-   - Check inventory pressure vs acquisition rate
-
-5. **Output the analysis**:
-
-```
+5. **Output Balance Report**:
+```markdown
 ## Balance Check: [System Name]
 
-### Data Sources Analyzed
-- [List of files read]
+### Hardware Constraints Analyzed
+- 8-bit Variable Limit: [Check]
+- 16-bit Variable Limit: [Check]
+- Script Math Complexity: [Check]
 
-### Health Summary: [HEALTHY / CONCERNS / CRITICAL ISSUES]
-
-### Outliers Detected
-| Item/Value | Expected Range | Actual | Issue |
-|-----------|---------------|--------|-------|
-
-### Degenerate Strategies Found
-- [Strategy description and why it is problematic]
+### Outliers Found
+| Item | Issue | Suggested Adjustment |
+|------|-------|----------------------|
+| Sword | Damage 256 | Reduce to 255 or use 16-bit |
 
 ### Progression Analysis
-[Graph description or table showing progression curve health]
+[Graph description showing XP curve health within variable bounds]
 
-### Recommendations
-| Priority | Issue | Suggested Fix | Impact |
-|----------|-------|--------------|--------|
-
-### Values That Need Attention
-[Specific values with suggested adjustments and rationale]
+### Verdict: [BALANCED / OVERFLOW RISK / CRITICAL IMBALANCE]
 ```
+
+### Rules
+- If a value exceeds 255, **must** recommend 16-bit variable handling.
+- Reject balance designs that require floating-point math without a lookup table (LUT) implementation.
+- Any mechanic that requires more than 50 global variables for a single system is "Poor Architecture".

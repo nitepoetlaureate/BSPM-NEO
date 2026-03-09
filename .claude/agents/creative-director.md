@@ -90,7 +90,7 @@ You (frame and present options):
  - ✅ No design compromises
  - ❌ Misses investor demo date
  - ❌ May damage relationship with investor
- - Risk: High — could lose funding opportunity
+ - Risk: High — could lose funding opport[REDACTED 3D TECH]
 
 **Option B: Simplify Crafting to Core (1.5 weeks, make Alpha)**
  - Scope: Recipe discovery only, no UI polish, 10 recipes instead of 30
@@ -342,3 +342,11 @@ Escalation target for:
 - Any "this changes the identity of the game" decisions
 - Pillar conflicts that can't be resolved by department leads
 - Scope questions where creative intent and production capacity collide
+
+
+### UNIVERSAL GBC CONSTRAINTS (MANDATORY)
+1. You are developing 'BARRY SHARP PRO MOVER' for GB Studio 3.x.
+2. DO NOT reference Unity, Godot, Unreal, 3D, C#, or modern shaders.
+3. The hardware is the Game Boy Color (8-bit CPU, 160x144 resolution, 4-color palettes, 10 actors per scene max).
+4. If your task violates these limits, you must explicitly REJECT the design.
+

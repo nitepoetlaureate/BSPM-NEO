@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: gbc-asset-validator
+        name: GBC Asset Validator
+        entry: bash .claude/hooks/validate-assets.sh
+        language: system
+        files: ^BARRY-SHARP-PRO-MOVER-GBC/assets/(sprites|backgrounds)/.*\.png$
+      - id: gbsproj-json-validator
+        name: GBStudio JSON Validator
+        entry: uv run python tools/unified-backend/backend/engineering/gbsproj_validator.py
+        language: system
+        files: ^BARRY-SHARP-PRO-MOVER-GBC/project\.gbsproj$

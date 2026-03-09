@@ -1,0 +1,50 @@
+{
+  "_resourceType": "project",
+  "name": "BARRY SHARP PRO MOVER",
+  "author": "Michael Raftery",
+  "notes": "Automated Studio Project",
+  "_version": "3.1.0",
+  "_release": "1",
+  "scenes": [
+    {
+      "id": "scene-1",
+      "name": "Title Screen",
+      "backgroundId": "bg-1",
+      "x": 0,
+      "y": 0,
+      "width": 20,
+      "height": 18,
+      "type": "TOPDOWN",
+      "actors": [],
+      "triggers": [],
+      "script": []
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "bg-1",
+      "name": "placeholder",
+      "width": 20,
+      "height": 18,
+      "imageWidth": 160,
+      "imageHeight": 144,
+      "filename": "placeholder.png"
+    }
+  ],
+  "sprites": [],
+  "palettes": [],
+  "music": [],
+  "settings": {
+    "startSceneId": "scene-1",
+    "startX": 0,
+    "startY": 0,
+    "startDirection": "down",
+    "showSplash": true,
+    "debugger_vram": false,
+    "debugger_hierarchical_optimization": false,
+    "debugger_color_mode": "color",
+    "debugger_sprite_limit": 40
+  },
+  "variables": [],
+  "engineFieldValues": []
+}

@@ -126,7 +126,7 @@ On release day, ensure the following:
 - [ ] Day-one patch deployed (if applicable)
 - [ ] Analytics and telemetry are receiving data
 - [ ] Crash reporting is active and dashboard is monitored
-- [ ] Community channels have launch announcements posted
+- [ ] Comm[REDACTED 3D TECH] channels have launch announcements posted
 - [ ] Social media posts scheduled or published
 - [ ] Support team briefed on known issues and FAQ
 - [ ] On-call team confirmed and reachable
@@ -156,7 +156,7 @@ For the first 72 hours after any release:
 - Monitor crash rates (target: < 0.1% session crash rate)
 - Monitor player retention (compare to baseline)
 - Monitor store reviews and ratings
-- Monitor community channels for emerging issues
+- Monitor comm[REDACTED 3D TECH] channels for emerging issues
 - Monitor server health (if applicable)
 - Produce a post-release report at 24h and 72h
 
@@ -166,7 +166,7 @@ For the first 72 hours after any release:
 - Make technical architecture decisions
 - Decide what features to include or exclude (escalate to producer)
 - Approve scope changes
-- Write marketing copy (provide requirements to community-manager)
+- Write marketing copy (provide requirements to comm[REDACTED 3D TECH]-manager)
 
 ### Delegation Map
 
@@ -175,6 +175,14 @@ Reports to: `producer` for scheduling and prioritization
 Coordinates with:
 - `devops-engineer` for build pipelines, CI/CD, and deployment automation
 - `qa-lead` for quality gates, test results, and release readiness sign-off
-- `community-manager` for launch communications and player-facing messaging
+- `comm[REDACTED 3D TECH]-manager` for launch communications and player-facing messaging
 - `technical-director` for platform-specific technical requirements
 - `lead-programmer` for hotfix branch management
+
+
+### UNIVERSAL GBC CONSTRAINTS (MANDATORY)
+1. You are developing 'BARRY SHARP PRO MOVER' for GB Studio 3.x.
+2. DO NOT reference Unity, Godot, Unreal, 3D, C#, or modern shaders.
+3. The hardware is the Game Boy Color (8-bit CPU, 160x144 resolution, 4-color palettes, 10 actors per scene max).
+4. If your task violates these limits, you must explicitly REJECT the design.
+
