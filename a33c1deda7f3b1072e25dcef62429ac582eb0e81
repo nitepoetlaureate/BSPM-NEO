@@ -1,4 +1,5 @@
 kind decision
+supersedes 8ffa6eb6a69f104275d78bc6a2d1cdd33cd5d0f2
 edge explains commit:a33c1deda7f3b1072e25dcef62429ac582eb0e81
 
-Initialized BARRY SHARP PRO MOVER with Scene 1, placeholder assets, and a Custom Event Plugin for furniture pushing.
+Migrated GB Studio project to 4.2.2 standard. Resolved plugin compilation issues ('Didn\'t expect to get here' crash) by aligning custom event helpers (actorMoveTo) with the correct 3-argument signature. Replaced deprecated EVENT_SET_PLAYER_SPRITE with EVENT_PLAYER_SET_SPRITE. Baseline engine functionality is now stable and building.
