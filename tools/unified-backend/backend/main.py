@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 from loguru import logger
 import sys
 
@@ -11,10 +12,12 @@ logger.remove()
 logger.add(sys.stderr, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}", level="INFO")
 
 class Settings(BaseSettings):
-    """Pydantic v2 Settings for the Studio Backend"""
-    discord_token: str = "placeholder"
-    huggingface_api_key: str = "placeholder"
-    tailscale_ip: str = "127.0.0.1"
+    """Pydantic v2 Settings for the Studio Backend with Strict Vault Enforcement"""
+    discord_token: str = Field(..., min_length=20, repr=False, description="Must be a valid Discord Bot Token")
+    huggingface_api_key: str = Field(..., min_length=10, repr=False, description="Must be a valid HF PRO Token")
+    hf_inference_url: str = Field(..., repr=False, description="URL for Llama-3 or chosen chat model")
+    rd_endpoint_url: str = Field(..., repr=False, description="URL for the Private RetroDiffusion Space")
+    tailscale_ip: str = Field("127.0.0.1", description="Local or Tailscale IP")
 
     model_config = SettingsConfigDict(
         env_file=".env", 
@@ -22,7 +25,7 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-settings = Settings()
+settings = Settings()  # type: ignore
 
 # Initialize FastAPI
 app = FastAPI(
@@ -38,6 +41,7 @@ app.include_router(watercooler.router)
 @app.on_event("startup")
 async def startup_event():
     logger.info("CCGS Backend is waking up...")
+    logger.info("Vault unlocked. Secrets loaded securely.")
     logger.info(f"Routers mapped. Environment: Tailscale IP {settings.tailscale_ip}")
 
 @app.get("/health")

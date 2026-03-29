@@ -1,54 +1,41 @@
-# Claude Code Game Studios -- Game Studio Agent Architecture
+# BARRY SHARP'S PRO MOVER -- Studio OS (GBC Edition)
 
-Indie game development managed through 48 coordinated Claude Code subagents.
-Each agent owns a specific domain, enforcing separation of concerns and quality.
+Indie game development managed through 48 coordinated AI agents, hyper-specialized for Game Boy Color hardware constraints.
 
 ## Technology Stack
 
-- **Engine**: [CHOOSE: Godot 4 / Unity / Unreal Engine 5]
-- **Language**: [CHOOSE: GDScript / C# / C++ / Blueprint]
-- **Version Control**: Git with trunk-based development
-- **Build System**: [SPECIFY after choosing engine]
-- **Asset Pipeline**: [SPECIFY after choosing engine]
-
-> **Note**: Engine-specialist agents exist for Godot, Unity, and Unreal with
-> dedicated sub-specialists. Use the set matching your engine.
-
-## Project Structure
-
-@.claude/docs/directory-structure.md
-
-## Engine Version Reference
-
-@docs/engine-reference/godot/VERSION.md
-
-## Technical Preferences
-
-@.claude/docs/technical-preferences.md
-
-## Coordination Rules
-
-@.claude/docs/coordination-rules.md
+- **Engine**: GB Studio 3.x
+- **Architecture**: Game Boy Color (GBC) / DMG
+- **Language**: GBVM (Game Boy Virtual Machine), SM83 Assembly, C (GBDK-2020)
+- **Primary Target**: .gbc ROM
+- **Asset Pipeline**: 4-color Indexed PNGs, .aseprite source files, .uge music
+- **Automation**: FastAPI Backend (Oracle VPS), npx gb-studio-cli (Mac Mini)
 
 ## Collaboration Protocol
 
-**User-driven collaboration, not autonomous execution.**
-Every task follows: **Question -> Options -> Decision -> Draft -> Approval**
+**USER-DRIVEN COLLABORATION (CRITICAL)**
+Every task MUST follow the Actor-Critic loop:
+1. **Request**: User provides goal in Discord/Terminal.
+2. **Draft**: Specialist agent (Actor) creates logic/asset.
+3. **Audit**: Lead agent (Critic) enforces GBC hardware limits.
+4. **Approval**: User approves final draft.
+5. **Execution**: Logic injected into `project.gbsproj` via Python tools.
 
-- Agents MUST ask "May I write this to [filepath]?" before using Write/Edit tools
-- Agents MUST show drafts or summaries before requesting approval
-- Multi-file changes require explicit approval for the full changeset
-- No commits without user instruction
+## The Mycelium Contract
 
-See `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md` for full protocol and examples.
+**MANDATORY FOR ALL AGENTS:**
+- **Arrival**: Run `mycelium.sh context <file>` before reading/editing.
+- **Departure**: Run `mycelium.sh note <file> -k decision -m "..."` after work.
 
-> **First session?** If the project has no engine configured and no game concept,
-> run `/start` to begin the guided onboarding flow.
+## Project Structure
 
-## Coding Standards
+- `BARRY-SHARP-PRO-MOVER-GBC/`: Core Game Boy project.
+- `tools/unified-backend/`: FastAPI brain, agent logic, and hardware-specific validators.
+- `design/`: Master GDD, Art Bible, and GBVM technical references.
+- `.claude/`: Studio configuration (Agents, Skills, Hooks, Rules).
 
-@.claude/docs/coding-standards.md
+## Available Command Hooks
 
-## Context Management
-
-@.claude/docs/context-management.md
+- `playtest.sh`: Compiles ROM and launches OpenEmu (Local Mac only).
+- `.claude/hooks/validate-assets.sh`: Mathematically enforces GBC color/tile limits.
+- `.claude/hooks/validate-commit.sh`: Verifies `.gbsproj` JSON integrity.

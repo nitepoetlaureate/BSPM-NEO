@@ -16,6 +16,9 @@ class CriticLoopEngine:
         current_draft = ""
         last_critique = ""
         
+        # Ensure Critic knows about the Mycelium rule
+        critic_prompt += "\n\nCRITICAL MANDATE: If the proposed solution edits a file but does NOT include a `mycelium.sh note` execution command to log the decision, you must REJECT it."
+        
         async with httpx.AsyncClient() as client:
             for i in range(max_retries):
                 # 1. Actor Drafts (or revises)

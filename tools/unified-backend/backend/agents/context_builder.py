@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 from loguru import logger
 from .config import AGENT_DEPARTMENT_MAP, DEPARTMENTAL_RULES
 
@@ -10,7 +11,21 @@ class AgentContextBuilder:
         self.agents_dir = self.repo_root / ".claude" / "agents"
         self.rules_dir = self.repo_root / ".claude" / "rules"
 
-    def build_system_prompt(self, agent_name: str, active_rules: list[str] | None = None) -> str:
+    def get_mycelium_context(self, target_file: str) -> str:
+        """Executes mycelium.sh context to retrieve the file's Git note history."""
+        try:
+            result = subprocess.run(
+                ["mycelium.sh", "context", target_file], 
+                capture_output=True, text=True, check=False
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return f"### MYCELIUM CONTEXT FOR {target_file} ###\n{result.stdout.strip()}"
+            return f"No Mycelium notes found for {target_file}."
+        except FileNotFoundError:
+            logger.warning("mycelium.sh not found in PATH.")
+            return "Mycelium context unavailable."
+
+    def build_system_prompt(self, agent_name: str, active_rules: list[str] | None = None, target_file: str | None = None) -> str:
         """Loads agent markdown and appends relevant departmental and architectural rules."""
         agent_file = self.agents_dir / f"{agent_name}.md"
         if not agent_file.exists():
@@ -27,6 +42,9 @@ class AgentContextBuilder:
         if dept and dept in DEPARTMENTAL_RULES:
             logger.info(f"Auto-applying departmental rules for {dept.value}: {DEPARTMENTAL_RULES[dept]}")
             all_rules.update(DEPARTMENTAL_RULES[dept])
+            
+        # Always append mycelium contract
+        all_rules.add("mycelium-contract")
 
         # 3. Build Rule Blocks
         rule_blocks = []
@@ -39,5 +57,11 @@ class AgentContextBuilder:
                 logger.warning(f"Requested rule file not found: {rule_file}")
 
         full_prompt = f"{persona}\n\n" + "\n\n".join(rule_blocks)
+        
+        # 4. Inject Mycelium Graph if target is provided
+        if target_file:
+            mycelium_graph = self.get_mycelium_context(target_file)
+            full_prompt = f"{mycelium_graph}\n\n{full_prompt}"
+            
         logger.info(f"Context compiled for agent: {agent_name} ({dept.value if dept else 'no-dept'})")
         return full_prompt
