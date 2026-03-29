@@ -1,0 +1,5 @@
+kind context
+edge applies-to tree:23cfcd3ebc2558d13cfa633dfd09d3e86a2bf28c
+edge targets-treepath treepath:.
+
+HANDOFF: Phase 1 (Infrastructure) and Phase 1.5 (Purification) are complete. 48 agents and 37 skills are GBC-ready. FastAPI backend is wired to Discord/PicoClaw. Moving to Phase 2 (Network Deployment). Real keys are required in .env. Use native HuggingFace MCP for ZeroGPU.
