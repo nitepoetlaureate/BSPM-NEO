@@ -1,0 +1,4 @@
+kind decision
+edge explains commit:af2124c4651de3be933069edb7e2a55613d71226
+
+Migrated GB Studio project to 4.2.2 standard. Resolved plugin compilation issues ('Didn\'t expect to get here' crash) by aligning custom event helpers (actorMoveTo) with the correct 3-argument signature. Replaced deprecated EVENT_SET_PLAYER_SPRITE with EVENT_PLAYER_SET_SPRITE. Baseline engine functionality is now stable and building.
