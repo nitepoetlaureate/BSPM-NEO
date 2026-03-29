@@ -21,3 +21,12 @@ fi
 if command -v gitleaks &>/dev/null; then
   gitleaks git --staged --no-banner --redact -l warn
 fi
+
+# Asset Gatekeeper Validation
+if [[ -f "$REPO_ROOT/scripts/validate_assets.py" ]]; then
+  echo "Running Asset Gatekeeper..."
+  python3 "$REPO_ROOT/scripts/validate_assets.py" || {
+    echo "Asset validation failed! Please fix constraints before committing."
+    exit 1
+  }
+fi

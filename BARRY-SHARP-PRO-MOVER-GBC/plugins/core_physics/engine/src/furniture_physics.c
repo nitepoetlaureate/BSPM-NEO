@@ -5,11 +5,9 @@
 #include "vm.h"
 
 // Define the global engine fields exposed in engine.json
-extern UBYTE barry_grip_strength;
-extern UBYTE global_gravity;
+UBYTE barry_grip_strength = 10;
+UBYTE global_gravity = 1;
 
-void apply_furniture_friction() __banked {
+void apply_furniture_friction(void) __banked {
     // This C function will be callable via GBVM assembly using VM_CALL_NATIVE.
-    // It handles the complex math of checking grid collision before allowing Barry to pivot a 2x1 couch.
-    // A stub for the AI Engine Programmer to expand upon.
 }
