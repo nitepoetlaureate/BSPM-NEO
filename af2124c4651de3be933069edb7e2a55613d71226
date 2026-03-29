@@ -1,4 +1,5 @@
 kind decision
+supersedes 3f62f681b58bc3a8ff28c19461f87ecc09df34e3
 edge explains commit:af2124c4651de3be933069edb7e2a55613d71226
 
-Migrated GB Studio project to 4.2.2 standard. Resolved plugin compilation issues ('Didn\'t expect to get here' crash) by aligning custom event helpers (actorMoveTo) with the correct 3-argument signature. Replaced deprecated EVENT_SET_PLAYER_SPRITE with EVENT_PLAYER_SET_SPRITE. Baseline engine functionality is now stable and building.
+Created two new skills (gbstudio-4-2-migration and gbstudio-plugin-dev) and mapped them to the engineering agents to ensure the studio permanently retains the architectural knowledge required for GB Studio 4.2.2.
