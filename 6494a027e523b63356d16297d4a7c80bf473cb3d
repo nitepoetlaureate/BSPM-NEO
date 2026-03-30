@@ -1,0 +1,8 @@
+kind summary
+edge explains commit:6494a027e523b63356d16297d4a7c80bf473cb3d
+
+Phase 1 and 2 of The Crucible Plan are largely complete.
+- Infrastructure:  updated to CLI, quantization script created, Discord router refactored for native CLI trigger.
+- Engine Logic:  updated with direction-aware GBVM logic. C engine plugin updated with collision stubs.
+- MCP Proof of Concept: Second crate added to Scene 1.
+- Note: Art generation via RetroDiffusion is prepared but requires valid API keys in  to be fully operational.
