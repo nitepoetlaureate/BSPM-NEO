@@ -20,49 +20,74 @@ const fields = [
 ];
 
 const compile = (input, helpers) => {
-    const { _addComment, _addInstruction, actorSetActive, actorMoveTo, variableSetToValue, appendRaw, _declareLocal, _if, _set, _stackPushConst, _stackPop } = helpers;
+    const { _addComment, actorSetActive, appendRaw, _declareLocal, _stackPop } = helpers;
     
-    _addComment("Start Push Furniture (Enhanced)");
+    _addComment("Start Push Furniture (Dynamic Math)");
     
-    // 1. Get Player Direction (Actor 0)
-    // Mapping: 1:R, 2:L, 4:U, 8:D
-    appendRaw("VM_ACTOR_GET_DIR .ARG0, .ARG0");
+    // 1. Get Player Direction (Actor 0) into a local
+    const dirVar = _declareLocal();
+    appendRaw(`VM_ACTOR_GET_DIR 0, ${dirVar}`);
     
-    // 2. Logic to move based on direction
-    // We will use a series of checks
-    
+    // 2. Set active actor to the target furniture
     actorSetActive(input.actorId);
     
-    // Simplified but functional approach using nested if-like logic or raw GBVM
-    // For the best performance and to prove the 'Engine Programmer' skill, let's use raw VM instructions
+    // 3. Get current position of target actor into locals
+    const xVar = _declareLocal();
+    const yVar = _declareLocal();
+    appendRaw(`VM_ACTOR_GET_POS 0, ${xVar}, ${yVar}`);
     
-    _addComment("Check Right");
-    appendRaw("VM_IF_CONST .EQ, .ARG0, 1, .L_PUSH_RIGHT, 0");
-    _addComment("Check Left");
-    appendRaw("VM_IF_CONST .EQ, .ARG0, 2, .L_PUSH_LEFT, 0");
-    _addComment("Check Up");
-    appendRaw("VM_IF_CONST .EQ, .ARG0, 4, .L_PUSH_UP, 0");
-    _addComment("Check Down");
-    appendRaw("VM_IF_CONST .EQ, .ARG0, 8, .L_PUSH_DOWN, 0");
-    appendRaw("VM_JUMP .L_PUSH_END");
+    // Calculate distance in subpixels (1 tile = 8 pixels = 128 subpixels)
+    const moveAmount = input.distance * 128;
+    
+    _addComment("Directional Logic");
 
-    appendRaw(".L_PUSH_RIGHT:");
-    actorMoveTo(15, 10, true); // Placeholder target for now
-    appendRaw("VM_JUMP .L_PUSH_END");
+    // Right (1)
+    appendRaw(`VM_IF_CONST .NE, ${dirVar}, 1, 1$, 0`);
+    appendRaw(`VM_RPN`);
+    appendRaw(`    .R_REF ${xVar}`);
+    appendRaw(`    .R_INT16 ${moveAmount}`);
+    appendRaw(`    .R_OPERATOR .ADD`);
+    appendRaw(`    .R_STOP`);
+    _stackPop(xVar);
+    appendRaw("VM_JUMP 5$");
+    appendRaw("1$:");
 
-    appendRaw(".L_PUSH_LEFT:");
-    actorMoveTo(11, 10, true);
-    appendRaw("VM_JUMP .L_PUSH_END");
+    // Left (2)
+    appendRaw(`VM_IF_CONST .NE, ${dirVar}, 2, 2$, 0`);
+    appendRaw(`VM_RPN`);
+    appendRaw(`    .R_REF ${xVar}`);
+    appendRaw(`    .R_INT16 ${moveAmount}`);
+    appendRaw(`    .R_OPERATOR .SUB`);
+    appendRaw(`    .R_STOP`);
+    _stackPop(xVar);
+    appendRaw("VM_JUMP 5$");
+    appendRaw("2$:");
 
-    appendRaw(".L_PUSH_UP:");
-    actorMoveTo(13, 9, true);
-    appendRaw("VM_JUMP .L_PUSH_END");
+    // Up (4)
+    appendRaw(`VM_IF_CONST .NE, ${dirVar}, 4, 3$, 0`);
+    appendRaw(`VM_RPN`);
+    appendRaw(`    .R_REF ${yVar}`);
+    appendRaw(`    .R_INT16 ${moveAmount}`);
+    appendRaw(`    .R_OPERATOR .SUB`);
+    appendRaw(`    .R_STOP`);
+    _stackPop(yVar);
+    appendRaw("VM_JUMP 5$");
+    appendRaw("3$:");
 
-    appendRaw(".L_PUSH_DOWN:");
-    actorMoveTo(13, 11, true);
-    appendRaw("VM_JUMP .L_PUSH_END");
+    // Down (8)
+    appendRaw(`VM_IF_CONST .NE, ${dirVar}, 8, 4$, 0`);
+    appendRaw(`VM_RPN`);
+    appendRaw(`    .R_REF ${yVar}`);
+    appendRaw(`    .R_INT16 ${moveAmount}`);
+    appendRaw(`    .R_OPERATOR .ADD`);
+    appendRaw(`    .R_STOP`);
+    _stackPop(yVar);
+    appendRaw("4$:");
 
-    appendRaw(".L_PUSH_END:");
+    appendRaw("5$:");
+    _addComment("Move to calculated X/Y");
+    // VM_ACTOR_MOVE_TO <actor_idx> <x_var> <y_var>
+    appendRaw(`VM_ACTOR_MOVE_TO 0, ${xVar}, ${yVar}`);
     _addComment("End Push Furniture");
 };
 
