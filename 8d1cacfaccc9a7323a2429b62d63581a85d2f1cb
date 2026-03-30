@@ -1,0 +1,4 @@
+kind summary
+edge explains commit:8d1cacfaccc9a7323a2429b62d63581a85d2f1cb
+
+Completed all phases of the Crucible Plan. Implemented dynamic GBVM math for grid-aligned pushing, C-engine friction math, robust JSON injector rollback, and configured the RetroDiffusion Space ID via env. The studio infrastructure is fully rectified and ready for asset and logic production.
