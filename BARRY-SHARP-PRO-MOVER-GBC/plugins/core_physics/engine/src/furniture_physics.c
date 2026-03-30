@@ -5,18 +5,20 @@
 #include "vm.h"
 #include "collision.h"
 
-// Define the global engine fields exposed in engine.json
-UBYTE barry_grip_strength = 10;
-UBYTE global_gravity = 1;
+extern UBYTE barry_grip_strength;
+extern UBYTE global_gravity;
 
-// Function to check if a tile is solid at pixel coordinates
 UBYTE is_solid_at(UBYTE x, UBYTE y) {
-    // Use the engine's built-in collision detection
     return tile_at_2(x, y);
 }
 
-void apply_furniture_friction(void) __banked {
-    // This C function can be called via VM_CALL_NATIVE.
-    // Logic to calculate if Barry has enough grip to push the furniture.
-    // Placeholder for real friction math.
+void apply_furniture_friction(SCRIPT_CTX * THIS) __banked {
+    // Basic math: if grip > gravity, return 1 (success), else 0 (fail)
+    UBYTE can_push = 0;
+    if (barry_grip_strength > global_gravity) {
+        can_push = 1;
+    }
+    
+    // Push the result back to the VM stack so GBVM can read it
+    *(THIS->stack_ptr) = can_push;
 }
