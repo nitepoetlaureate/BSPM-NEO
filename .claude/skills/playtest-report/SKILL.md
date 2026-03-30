@@ -1,55 +1,43 @@
 ---
 name: playtest-report
-description: "Generates a structured playtest report for GB Studio projects. Analyzes playtest notes, focusing on hardware-accurate behavior and Game Boy ergonomics."
-argument-hint: "[new|analyze path-to-notes]"
+description: "Triggers the GB Studio playtest environment and coordinates human-in-the-loop playtest feedback."
+argument-hint: "[new|analyze]"
 user-invocable: true
-allowed-tools: Read, Glob, Grep, Write
+allowed-tools: Bash, Read, Write
 ---
-# Code/Quality Purifier: GB Studio Playtest Report
+# GBC Playtest Coordinator
 
-When this skill is invoked with `new`, generate this GB Studio specific template:
+When this skill is invoked:
+
+1. **Trigger the Playtest Build**:
+   - Execute `./playtest.sh`. This will build and serve the project for the browser or emulator.
+
+2. **Engage the Human Tester**:
+   - Ask the user to play the build in their browser/emulator.
+   - Request specific feedback on Game Boy hardware feel and ergonomics.
+
+3. **Generate/Analyze the Report**:
+   - Once the user reports back, summarize the findings into the following structure.
 
 ```markdown
-# Playtest Report: [Build Name]
+# Playtest Report: [Build/Date]
 
-## Session Info
-- **Date**: [Date]
-- **ROM Build**: [Version/Commit]
-- **Platform**: [Original Hardware / Analogue Pocket / Emulator]
-- **Tester**: [Name/ID]
-- **Input Method**: [Original GB / SNES Controller / Keyboard]
+## Playtest Execution
+- **Command**: `./playtest.sh`
+- **Platform**: [Browser / Emulator / Original Hardware]
+
+## Human Feedback Summary
+- **Visual Performance**: [Flicker/Corruption reported by user]
+- **Gameplay Feel**: [Ergonomics and responsiveness feedback]
 
 ## Hardware Verification
-- **Visual Artifacts?** [Yes/No] (Flicker, tile corruption)
-- **Audio Lag?** [Yes/No]
-- **Input Responsiveness?** [Yes/No/Sluggish]
+- **Sprite Limits**: [Are more than 10 sprites on a row causing flicker?]
+- **Tile Memory**: [Reported graphic glitches during transitions]
 
-## First Impressions (3-5 mins)
-- **Goal Clear?** [Yes/No]
-- **Text Readability?** [Good/Bad] (Small screen check)
-- **Emotional Response**: [Engaged/Confused/Frustrated]
-
-## Gameplay Flow
-### What worked
-- [Observation]
-
-### GB Specific Pain Points
-- **Flicker on too many sprites**: [Yes/No]
-- **Navigation in small spaces**: [Issue]
-- **Menu navigation speed**: [Issue]
-
-## Bugs (Hardware vs Emulator)
-| # | Bug | Severity | Found on Hardware? |
-|---|-----|----------|-------------------|
-| 1 | Tile corruption on screen transition | High | Yes |
-
-## Overall Assessment
-- **Difficulty**: [Too Easy / Just Right / Too Hard]
-- **Pacing**: [Good / Laggy / Too Fast]
-- **Verdict**: [READY FOR RELEASE / NEEDS POLISH / UNSTABLE]
-
-## Top 3 Priorities
-1. [Highest priority]
+## Verdict
+- **Ready for Release?** [YES / NO / NEEDS POLISH]
 ```
 
-When invoked with `analyze`, process raw notes into this format, prioritizing hardware-specific observations over general gameplay feedback.
+### Rules
+- **Human-in-the-Loop**: Agents do not "play" the game; they trigger the build and ask the user for observations.
+- **Hardware Focus**: Prioritize feedback related to GBC hardware constraints over general aesthetics.

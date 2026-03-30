@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gbstudio-claude-mcp": {
+      "command": "npx",
+      "args": [
+        "gbstudio-claude-mcp@latest",
+        "--path",
+        "/Users/michaelraftery/Claude-Code-Game-Studios/BARRY-SHARP-PRO-MOVER-GBC"
+      ]
+    }
+  }
+}

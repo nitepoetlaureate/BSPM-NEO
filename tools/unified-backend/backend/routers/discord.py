@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+import subprocess
+import asyncio
+from fastapi import APIRouter, BackgroundTasks, Request
 from loguru import logger
 from pydantic import BaseModel
 from backend.agents.config import AGENT_DEPARTMENT_MAP, Department
@@ -11,27 +13,36 @@ class DiscordMessage(BaseModel):
     content: str
     attachments: list[str] = []
 
+def run_agent_task(agent_name: str, content: str):
+    logger.info(f"Triggering Gemini CLI agent: {agent_name}")
+    try:
+        # NATIVE CLI TRIGGER:
+        # Command: gemini chat --agent <agent_name> -m "<content>"
+        subprocess.run(["gemini", "chat", "--agent", agent_name, "-m", content], check=False)
+    except Exception as e:
+        logger.error(f"Failed to spawn agent CLI: {e}")
+
 @router.post("")
-async def handle_discord_webhook(msg: DiscordMessage):
-    """Entry point for PicoClaw messages from Discord."""
+async def handle_discord_webhook(msg: DiscordMessage, background_tasks: BackgroundTasks):
+    """
+    Entry point for Discord messages.
+    Payload Format (JSON):
+    {
+        "channel_id": "string",
+        "username": "string",
+        "content": "string",
+        "attachments": ["url1", "url2"]
+    }
+    """
     logger.info(f"Discord Message Received from {msg.username} in {msg.channel_id}")
     
-    # 1. Map Channel ID/Name to Department
-    # Mapping logic: check if channel name contains department name
-    target_dept = None
-    for dept in Department:
-        if dept.value.lower() in msg.channel_id.lower():
-            target_dept = dept
+    # Map Channel to Agent
+    target_agent = "generalist"
+    for agent_name in AGENT_DEPARTMENT_MAP.keys():
+        if agent_name in msg.channel_id.lower():
+            target_agent = agent_name
             break
-            
-    if not target_dept:
-        logger.warning(f"No department found for channel {msg.channel_id}. Defaulting to EXECUTIVE.")
-        target_dept = Department.EXECUTIVE
     
-    # 2. Trigger the appropriate Agentic workflow
-    # This will later call the CriticLoopEngine with the correct department context
-    return {
-        "status": "accepted",
-        "department": target_dept.value,
-        "agent_roster_count": len([a for a, d in AGENT_DEPARTMENT_MAP.items() if d == target_dept])
-    }
+    background_tasks.add_task(run_agent_task, target_agent, msg.content)
+    
+    return {"status": "accepted", "agent": target_agent}

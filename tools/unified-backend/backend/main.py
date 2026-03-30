@@ -11,12 +11,14 @@ from backend.routers import watercooler
 logger.remove()
 logger.add(sys.stderr, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}", level="INFO")
 
+from typing import Optional
+
 class Settings(BaseSettings):
-    """Pydantic v2 Settings for the Studio Backend with Strict Vault Enforcement"""
-    discord_token: str = Field(..., min_length=20, repr=False, description="Must be a valid Discord Bot Token")
-    huggingface_api_key: str = Field(..., min_length=10, repr=False, description="Must be a valid HF PRO Token")
-    hf_inference_url: str = Field(..., repr=False, description="URL for Llama-3 or chosen chat model")
-    rd_endpoint_url: str = Field(..., repr=False, description="URL for the Private RetroDiffusion Space")
+    """Pydantic v2 Settings for the Studio Backend with Graceful Degradation"""
+    discord_token: Optional[str] = Field(None, repr=False, description="Discord Bot Token (Optional for local dev)")
+    huggingface_api_key: Optional[str] = Field(None, repr=False, description="HF PRO Token (Optional for local dev)")
+    hf_inference_url: Optional[str] = Field(None, repr=False, description="URL for Llama-3 or chosen chat model")
+    rd_endpoint_url: Optional[str] = Field(None, repr=False, description="URL for the Private RetroDiffusion Space")
     tailscale_ip: str = Field("127.0.0.1", description="Local or Tailscale IP")
 
     model_config = SettingsConfigDict(

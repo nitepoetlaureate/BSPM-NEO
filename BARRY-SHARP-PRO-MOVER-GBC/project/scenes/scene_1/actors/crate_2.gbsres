@@ -1,0 +1,38 @@
+{
+  "_resourceType": "actor",
+  "id": "0e0e3ddb-5186-40f0-b0a8-55ef208049d8",
+  "name": "crate_2",
+  "frame": 0,
+  "animate": false,
+  "spriteSheetId": "de0bbc33-4afb-4bfc-95e1-5be5964c3301",
+  "prefabId": "",
+  "direction": "down",
+  "moveSpeed": 1,
+  "animSpeed": 15,
+  "paletteId": "",
+  "isPinned": false,
+  "persistent": false,
+  "collisionGroup": "",
+  "collisionExtraFlags": [],
+  "prefabScriptOverrides": {},
+  "symbol": "actor_2",
+  "script": [
+    {
+      "command": "BSPM_EVENT_PUSH_FURNITURE",
+      "args": {
+        "actorId": "$self$",
+        "distance": 2
+      },
+      "id": "702f671b-4cc7-461e-9421-ade5c9c8c209"
+    }
+  ],
+  "startScript": [],
+  "updateScript": [],
+  "hit1Script": [],
+  "hit2Script": [],
+  "hit3Script": [],
+  "coordinateType": "tiles",
+  "x": 14,
+  "y": 10,
+  "_index": 2
+}

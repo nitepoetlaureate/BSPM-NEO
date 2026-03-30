@@ -1,82 +1,51 @@
 ---
 name: architecture-decision
-description: "Creates an Architecture Decision Record (ADR) for GB Studio technical choices. Documents context, 8-bit alternatives, and hardware consequences."
+description: "Documents hardware-strict decisions and ensures they are logged into the Mycelium state engine."
 argument-hint: "[title]"
 user-invocable: true
-allowed-tools: Read, Glob, Grep, Write
+allowed-tools: Read, Write, Bash
 ---
+
+# ADR: GBC Hardware Decision
 
 When this skill is invoked:
 
-1. **Next ADR number**: Scan `docs/architecture/` for existing ADRs.
+1. **Guide the Decision**:
+   - Focus exclusively on GB Studio 3.x and GBC hardware.
+   - Every decision MUST respect 8-bit architecture and memory limits.
 
-2. **Gather context**: Read related scripts and existing ADRs.
+2. **Generate the ADR Document**:
+   - Save to `docs/architecture/ADR-[NNNN].md`.
 
-3. **Guide the user through the decision**: Ask clarifying questions focused on GB Studio 3.x and 8-bit hardware.
-
-4. **Generate the ADR** following this format:
+3. **Log into Mycelium (MANDATORY)**:
+   - Every architectural decision MUST be logged into the Mycelium state engine.
+   - Either trigger a Mycelium sync command OR write the decision details to `production/session-state/active.md`.
 
 ```markdown
-# ADR-[NNNN]: [Title] (GB Studio 3.x)
+# ADR-[NNNN]: [Title] (GBC Architecture)
 
 ## Status
 [Proposed | Accepted | Deprecated]
 
-## Context
-
-### Problem Statement
-[What problem are we solving within GB Studio logic/scripting?]
-
-### Hardware Constraints (8-bit)
-- Max 20 actors per scene.
-- Max 10 sprites per row.
-- 8-bit integer variables (0-255 range).
-- 4-color palettes per tile.
-- **NO 3D, NO VFX, NO FLOATS.**
-
-### Requirements
-- [Must support X in the GB emulator]
-- [Must fit within variable limits]
+## GBC Hardware Constraints
+- Max 10 actors per scene.
+- 8-bit integer variables (0-255).
+- Balanced GBVM stack.
+- **NO 3D, NO FLOATS.**
 
 ## Decision
+[The specific technical decision made]
 
-[The specific technical decision made for GB Studio, including script trigger logic and variable mapping.]
-
-### Logic Diagram
-[ASCII flow for GB Studio script events]
-
-### 8-bit Variable Usage
-[Mapping of bits/variables created by this decision]
-
-## Alternatives Considered (8-bit)
-
-### Alternative 1: [Name]
-- **Pros**: Low actor overhead.
-- **Cons**: High variable usage.
-- **Rejection Reason**: [Hardware limit violation?]
+## Mycelium Sync Status
+- **Logged to Mycelium**: [YES/NO]
+- **Session File Update**: [Updated `production/session-state/active.md`]
 
 ## Consequences
-
-### Positive
-- [Better performance / lower flicker]
-
-### Negative
-- [8-bit complexity increase]
-
-## Performance Implications (8-bit)
-- **Actor Density**: [Expected impact]
-- **CPU/VBlank**: [Expected impact, e.g. sprite flicker]
-- **Memory/Variables**: [Number of 8-bit global variables used]
-
-## Validation Criteria
-- ROM compiles cleanly.
-- Logic passes 8-bit range testing (no overflow).
-
-## Related Decisions
-- [Links to related ADRs]
+- **Positive**: [Better performance / lower flicker]
+- **Negative**: [Increased 8-bit complexity]
 ```
 
-5. **Guidelines**:
-- **Delegate to `systems-designer`** for 8-bit math validation.
-- **Delegate to `game-designer`** for scripting feasibility check.
-- **FAIL** if mentions 3D, VFX, or non-8-bit logic.
+### Rules
+- **Mycelium Integration**: A decision is NOT complete until it is logged to `production/session-state/active.md`.
+- **Fail on Modernity**: Reject any mention of 3D, VFX, or floats.
+- **Strictly 8-bit**: Prioritize GBC architecture above all else.

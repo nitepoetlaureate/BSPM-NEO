@@ -1,68 +1,39 @@
 ---
 name: asset-audit
-description: "Audits GBC game assets (.png, .aseprite, .uge, .gbsproj) for compliance with GBC hardware limitations, naming conventions, and GB Studio requirements."
+description: "Strictly audits GBC game assets using the automated validation script to ensure compliance with hardware limits."
 argument-hint: "[category|all]"
 user-invocable: true
-allowed-tools: Read, Glob, Grep
+allowed-tools: Bash, Read
 ---
+
+# GBC Asset Audit (Automated)
 
 When this skill is invoked:
 
-1. **Read the GBC asset standards** from `design/art-bible.md` and `CLAUDE.md`.
+1. **Execute the validation script**:
+   - Run `python3 scripts/validate_assets.py`.
+   - This script checks for GBC hardware limitations, naming conventions, and GB Studio requirements.
 
-2. **Scan the target asset directories** using Glob for specific GBC formats:
-   - `assets/backgrounds/**/*.png`
-   - `assets/sprites/**/*.png`
-   - `assets/music/**/*.uge`
-   - `assets/data/**/*.gbsproj`
-   - `**/*.aseprite` (Source files)
+2. **Analyze the output**:
+   - Capture all output from the script, especially warnings and errors.
+   - Do NOT perform manual visual checks or manual file scanning.
 
-3. **Check naming conventions**:
-   - Backgrounds: `bg_[name].png`
-   - Sprites: `sprite_[name].png`
-   - Music: `music_[name].uge`
-   - All files must be lowercase with underscores.
-
-4. **Check GBC Hardware Standards**:
-   - **PNG (Backgrounds)**: Must be 160x144 or larger (multiples of 8). Max 256 unique tiles per scene.
-   - **PNG (Sprites)**: Must follow GB Studio sprite sheet layouts (16x16 or 16x8 frames).
-   - **Color Palette**: 4 colors per palette (indexed). Total 32,768 possible colors, but limited to 8 palettes per background/sprite.
-   - **UGE (Audio)**: 4-channel GBC hardware compatible.
-
-5. **Check for orphaned assets** by searching the `.gbsproj` file and scripts for references.
-
-6. **Check for missing assets** by verifying all references in the `.gbsproj` exist in the filesystem.
-
-7. **Output the audit**:
+3. **Output the audit report**:
 
 ```markdown
-# GBC Asset Audit Report -- [Category] -- [Date]
+# GBC Asset Audit Report -- [Date]
 
 ## Summary
-- **Total assets scanned**: [N]
-- **GBC hardware violations**: [N]
-- **Naming violations**: [N]
-- **Orphaned assets**: [N]
-- **Missing assets**: [N]
-- **Overall health**: [GBC COMPLIANT / ISSUES FOUND]
+- **Validation Status**: [PASSED / FAILED / WARNINGS]
+- **Command Executed**: `python3 scripts/validate_assets.py`
 
-## Hardware Violations (Tile/Sprite/Palette Limits)
-| File | Requirement | Actual | Issue |
-|------|-------------|--------|-------|
+## Validation Output
+[Insert the full output from the script here]
 
-## Naming Violations
-| File | Expected Pattern | Issue |
-|------|-----------------|-------|
-
-## Format Violations (Only .png, .aseprite, .uge, .gbsproj allowed)
-| File | Actual Format | Status |
-|------|---------------|--------|
-
-## Orphaned Assets (No .gbsproj references)
-| File | Last Modified | Size |
-|------|-------------|------|
-
-## Missing Assets (Referenced in .gbsproj but missing)
-| Reference Location | Expected Path |
-|-------------------|---------------|
+## Required Actions
+- [List specific assets that failed validation and why, based on script output]
 ```
+
+### Rules
+- **No Manual Audits**: Always rely on `python3 scripts/validate_assets.py`.
+- **Hard Block**: Any asset failure reported by the script is a blocker for production.

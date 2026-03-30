@@ -23,10 +23,8 @@ BUILD_DIR="BARRY-SHARP-PRO-MOVER-GBC/build"
 # Check for argument
 if [ "$1" == "--rom" ]; then
     echo "Compiling ROM via npx gb-studio-cli..."
-    cd "$PROJECT_DIR"
-    npx gb-studio-cli make:rom -c "project.gbsproj" -o "build"
+    npx gb-studio-cli build "$PROJECT" "$BUILD_DIR" -t rom
     BUILD_STATUS=$?
-    cd ..
 
     if [ $BUILD_STATUS -eq 0 ]; then
         ROM_FILE="$BUILD_DIR/rom/game.gbc"
@@ -39,10 +37,8 @@ if [ "$1" == "--rom" ]; then
     fi
 else
     echo "Compiling Web Build via npx gb-studio-cli..."
-    cd "$PROJECT_DIR"
-    npx gb-studio-cli make:web -c "project.gbsproj" -o "build"
+    npx gb-studio-cli build "$PROJECT" "$BUILD_DIR" -t web
     BUILD_STATUS=$?
-    cd ..
 
     if [ $BUILD_STATUS -eq 0 ]; then
         echo "Web Build Success."

@@ -1,58 +1,49 @@
 ---
 name: code-review
-description: "Performs a rigorous quality and architectural review of GB Studio scripts (GBVM/GBScript) and project structure. Checks for script depth, variable efficiency, and bank optimization."
+description: "Performs a hardware-strict quality and architectural review focusing on GBVM stack balancing and 8-bit constraints."
 argument-hint: "[path-to-script-or-scene]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
-# Code/Quality Purifier: GB Studio Review
+# GBVM Code Review: GBC Hardware Compliance
 
 When this skill is invoked:
 
-1. **Read the target file(s)** (GBS scripts, GBVM files, or .gbsproj JSON fragments).
+1. **Focus on GBVM Stack Balancing**:
+   - Every `VM_PUSH` MUST have a matching `VM_POP`.
+   - Any stack leak is an immediate failure.
 
-2. **Read CLAUDE.md** for project-specific naming conventions and variable ranges.
+2. **Strict 8-bit Enforcement**:
+   - Verify all variables are 8-bit integers (0-255).
+   - Check all C-engine overrides for compliance with the GBC's 8-bit architecture.
 
-3. **Evaluate against GB Studio Standards**:
-   - [ ] **Script Depth**: Ensure no script exceeds safe GBVM stack limits (instruction depth).
-   - [ ] **Variable Usage**: Verify variables are scoped correctly (Local vs Global) and reused where possible to save the 512-variable limit.
-   - [ ] **Actor/Trigger Limits**: Confirm scene does not exceed 20 actors or 30 triggers.
-   - [ ] **Bank Optimization**: Check that large scripts or data aren't causing bank overflows.
-   - [ ] **Logic Verification**: Replace unit test checks with "Logic Injection" readiness (can this script be triggered/tested in isolation via `gb-studio-cli`?).
+3. **Reject Floating Point Math**:
+   - **FAIL** any script or override that includes floating point operations (`float`, `double`).
+   - Formulas must be converted to 8-bit integer look-up tables or scaled integer math.
 
-4. **Check Architectural Compliance**:
-   - [ ] **Modular Scripts**: Are common logic blocks extracted into "Custom Scripts"?
-   - [ ] **Event Flow**: No deep nesting of "If" statements (prefer early exits or state machine switches).
-   - [ ] **Hardware Compatibility**: No 16-bit operations where 8-bit suffices.
-
-5. **Output the review** in this format:
+4. **Output the Review**:
 
 ```markdown
-## Code Review: [Script/Scene Name]
+## Code Review: [Script/Override Name]
 
-### GB Studio Compliance: [X/5 passing]
-[List violations: e.g., "Script depth exceeds 255 instructions", "Global variable leak"]
+### GBVM Stack Balancing: [BALANCED / LEAK]
+[Detail any mismatched PUSH/POP pairs]
 
-### Architecture: [CLEAN / BLOATED / DEBT FOUND]
-[Analyze use of Custom Scripts and event flow]
+### Hardware Constraints (8-bit): [PASSED / FAILED]
+- **Variable Range**: [All are 0-255 / Out of range found]
+- **C-Engine Overrides**: [Strictly 8-bit / Modern artifacts found]
 
-### Resource Efficiency
-[VRAM, Variable, and Actor usage analysis]
-
-### Logic Verification Readiness
-[Can this be verified via `gb-studio-cli` injection? Yes/No]
+### Mathematical Integrity: [NO FLOATS / FLOAT DETECTED]
+- **Floating Point Math**: [None / FOUND - MUST REWRITE]
 
 ### Required Changes
-[Must-fix items: e.g., "Flatten nested conditionals in Actor 3"]
+[List specific lines for stack repair or float removal]
 
-### Suggestions
-[Optimization tips]
-
-### Verdict: [PURIFIED / NEEDS CLEANUP / REJECTED]
+### Verdict: [PURIFIED / REJECTED]
 ```
 
 ### Rules
-- Prioritize **hardware limitations** over "clean code" abstractions if they conflict.
-- Reject any script that uses "Wait" commands in global/persistent loops without clear exit conditions.
-- Flags "On Update" scripts that perform complex math every frame.
+- **Stack Integrity is First**: Never approve a script with an unbalanced stack.
+- **Hardware-Strict**: Prioritize Game Boy (LR35902) limitations over any modern clean-code convention.
+- **Float-Free Zone**: Any mention of floating point is an automatic `REJECTED` verdict.
