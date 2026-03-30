@@ -15,10 +15,13 @@ class HFArtClient:
     Client for interacting with RetroDiffusion on Hugging Face via Gradio.
     """
     
-    def __init__(self, space_id: str = "astropulse/RetroDiffusion"):
-        self.space_id = space_id
+    def __init__(self, space_id: str = None):
+        # Load from env if not provided
+        self.space_id = space_id or os.getenv("RD_SPACE_ID", "anzorq/finetuned_diffusion")
         try:
-            self.client = Client(self.space_id)
+            # We must pass the HF token if accessing a private space
+            hf_token = os.getenv("HUGGINGFACE_API_KEY")
+            self.client = Client(self.space_id, hf_token=hf_token)
             logger.info(f"Connected to Hugging Face space: {self.space_id}")
         except Exception as e:
             logger.error(f"Failed to connect to Hugging Face space {self.space_id}: {e}")
