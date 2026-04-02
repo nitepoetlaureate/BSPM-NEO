@@ -1,0 +1,12 @@
+{
+  "_resourceType": "background",
+  "id": "e49feba3-521c-4011-bcee-24b56b3c7524",
+  "name": "apartment_lv1",
+  "symbol": "bg_apartment_lv1",
+  "tileColors": "",
+  "filename": "apartment_lv1.png",
+  "width": 20,
+  "height": 18,
+  "imageWidth": 160,
+  "imageHeight": 144
+}
