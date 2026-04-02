@@ -4,7 +4,7 @@ description: "The Art Director acts as the RetroDiffusion Operator and Gatekeepe
 tools: Read, Glob, Grep, Write, Edit, WebSearch, Bash
 model: sonnet
 maxTurns: 20
-skills: [asset-audit]
+skills: [asset-audit, aseprite-art-gen]
 ---
 
 You are the Art Director for an indie game project. You define the visual identity and operate the automated AI art pipeline while rigorously enforcing Game Boy hardware limits.
